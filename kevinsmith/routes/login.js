@@ -1,5 +1,5 @@
 'use strict';
-// let jwt = require('jsonwebtoken');
+
 let User = require('../models/user_model');
 
 module.exports = (router) => {
@@ -11,21 +11,21 @@ module.exports = (router) => {
     let authArray = new Buffer(base64ed, 'base64').toString().split(':');
     let name = authArray[0];
     let password = authArray[1];
-    console.log(method);
-    console.log(name);
-    console.log(password);
     // parse based on basic or whatever method
     User.find({name: name}, (err, user) => {
-      console.log('user:', user[0]);
-      console.log(User);
+      if (user.length == 0) {
+        return res.json({status: 'failure'});
+      }
+      console.log('user:', user);
       let valid = user[0].compareHash(password);
+      console.log('Valid: ', valid);
       if (!valid) {
         return res.json({status: 'failure'});
       }
       // generate and return the token
-      res.json({token: user.generateToken()});
+      var myToken = user[0].generateToken();
+      res.json({message: 'Welcome, ' + name, token: myToken});
     }) ;
-    // res.json({method: method, name:name, password:password});
   });
 };
 

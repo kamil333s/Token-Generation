@@ -16,15 +16,23 @@ require('./routes/login')(publicRouter);
 app.use(publicRouter);
 
 app.post('/setup', (req, res) => {
-  var newUser = new User({name:'BOB', password:'noway'});
+  var newUser = new User(req.body);
   newUser.save((err, user) => {
     res.json(user);
   });
 });
 
-app.get('/setup/verify', (req, res) => {
+app.get('/setup', (req, res) => {
   User.find({}, (err, list) => {
     res.json(list);
+  });
+});
+
+app.put('/users/:id', (req, res) => {
+  User.findByIdAndUpdate(req.params.id, { password: req.body.password }, (err, user) => {
+    if (err) return res.send(err);
+    console.log('Updated: ', user  );
+    res.json(user);
   });
 });
 
